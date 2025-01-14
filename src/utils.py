@@ -4,7 +4,10 @@ from src.constants import (
 import logging
 
 logger = logging.getLogger(__name__)
-from src.base import Message
+from src.base import Message as BaseMessage
+
+# Use BaseMessage to avoid confusion with other Message classes
+Message = BaseMessage
 from discord import Message as DiscordMessage
 from typing import Optional, List
 import discord
