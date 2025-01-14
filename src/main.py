@@ -30,8 +30,14 @@ from src.moderation import (
     send_moderation_flagged_message,
 )
 
+# Configure logging to both file and console
 logging.basicConfig(
-    format="[%(asctime)s] [%(filename)s:%(lineno)d] %(message)s", level=logging.INFO
+    format="[%(asctime)s] [%(filename)s:%(lineno)d] %(message)s",
+    level=logging.INFO,
+    handlers=[
+        logging.FileHandler("discord_bot.log"),
+        logging.StreamHandler()
+    ]
 )
 
 intents = discord.Intents.default()
