@@ -76,5 +76,5 @@ MAX_CHARS_PER_REPLY_MSG = 1800
 AVAILABLE_MODELS = ["gpt-3.5-turbo", "gpt-4"]
 DEFAULT_MODEL = "gpt-3.5-turbo"
 
-# Bot invite URL with required permissions
-BOT_INVITE_URL = f"https://discord.com/api/oauth2/authorize?client_id={DISCORD_CLIENT_ID}&permissions=534723950656&scope=bot%20applications.commands"
+# Bot invite URL with required permissions (8 = Send Messages)
+BOT_INVITE_URL = f"https://discord.com/api/oauth2/authorize?client_id={DISCORD_CLIENT_ID}&permissions=8&scope=bot%20applications.commands"
