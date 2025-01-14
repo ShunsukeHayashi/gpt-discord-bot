@@ -5,10 +5,8 @@ DISCORD_BOT_TOKEN = os.environ["DISCORD_BOT_TOKEN"]
 OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 DISCORD_CLIENT_ID = os.environ["DISCORD_CLIENT_ID"]
 
-# Get allowed server IDs from environment variable, or allow all if not set
-ALLOWED_SERVER_IDS = os.environ.get("ALLOWED_SERVER_IDS", "").split(",")
-if not ALLOWED_SERVER_IDS or ALLOWED_SERVER_IDS == [""]:
-    ALLOWED_SERVER_IDS = []  # Empty list means all servers are allowed
+# Set allowed server ID
+ALLOWED_SERVER_IDS = [1199878847466836059]  # Only allow this specific server
 
 # Get server to moderation channel mapping from environment variable
 SERVER_TO_MODERATION_CHANNEL: Dict[int, int] = {}

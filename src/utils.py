@@ -63,8 +63,12 @@ def should_block(guild: Optional[discord.Guild]) -> bool:
         logger.info(f"DM not supported")
         return True
 
-    if guild.id and guild.id not in ALLOWED_SERVER_IDS:
-        # not allowed in this server
-        logger.info(f"Guild {guild} not allowed")
-        return True
+    if guild.id:
+        if not ALLOWED_SERVER_IDS:
+            # Empty list means all servers are allowed
+            return False
+        if guild.id not in ALLOWED_SERVER_IDS:
+            # not allowed in this server
+            logger.info(f"Guild {guild.name} (ID: {guild.id}) not allowed")
+            return True
     return False
