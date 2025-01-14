@@ -12,7 +12,6 @@ from src.constants import (
     ACTIVATE_THREAD_PREFX,
     MAX_THREAD_MESSAGES,
     SECONDS_DELAY_RECEIVING_MSG,
-    AVAILABLE_MODELS,
     DEFAULT_MODEL,
 )
 import asyncio
@@ -78,7 +77,7 @@ async def on_ready():
 async def chat_command(
     int: discord.Interaction,
     message: str,
-    model: AVAILABLE_MODELS = DEFAULT_MODEL,
+    model: str = DEFAULT_MODEL,
     temperature: Optional[float] = 1.0,
     max_tokens: Optional[int] = 512,
 ):
