@@ -8,7 +8,10 @@ from src.constants import (
     EXAMPLE_CONVOS,
 )
 import discord
-from src.base import Message, Prompt, Conversation, ThreadConfig
+from src.base import Message as BaseMessage, Prompt, Conversation, ThreadConfig
+
+# Use BaseMessage to avoid confusion with other Message classes
+Message = BaseMessage
 from src.utils import split_into_shorter_messages, close_thread, logger
 from src.moderation import (
     moderate_message,
