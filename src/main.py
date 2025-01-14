@@ -195,10 +195,16 @@ async def chat_command(
                 )
         except Exception as e:
             logger.exception(e)
-            await int.followup.send(
-                f"Failed to process chat: {str(e)}",
-                ephemeral=True,
-            )
+            if not int.response.is_done():
+                await int.response.send_message(
+                    f"Failed to process chat: {str(e)}",
+                    ephemeral=True,
+                )
+            else:
+                await int.followup.send(
+                    f"Failed to process chat: {str(e)}",
+                    ephemeral=True,
+                )
             return
     except Exception as e:
         logger.exception(e)
