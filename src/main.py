@@ -85,10 +85,18 @@ async def chat_command(
     try:
         # only support creating thread in text channel
         if not isinstance(int.channel, discord.TextChannel):
+            await int.response.send_message(
+                "This command can only be used in a text channel.",
+                ephemeral=True,
+            )
             return
 
         # block servers not in allow list
         if should_block(guild=int.guild):
+            await int.response.send_message(
+                "This server is not in the allow list.",
+                ephemeral=True,
+            )
             return
 
         user = int.user
@@ -151,38 +159,55 @@ async def chat_command(
                 message=message,
                 url=response.jump_url,
             )
+
+            # create the thread
+            try:
+                thread = await response.create_thread(
+                    name=f"{ACTIVATE_THREAD_PREFX} {user.name[:20]} - {message[:30]}",
+                    slowmode_delay=1,
+                    reason="gpt-bot",
+                    auto_archive_duration=60,
+                )
+            except discord.Forbidden:
+                await int.followup.send(
+                    "I don't have permission to create threads. Please give me the 'Create Public Threads' permission.",
+                    ephemeral=True,
+                )
+                return
+            except Exception as e:
+                await int.followup.send(
+                    f"Failed to create thread: {str(e)}",
+                    ephemeral=True,
+                )
+                return
+
+            thread_data[thread.id] = ThreadConfig(
+                model=model, max_tokens=max_tokens, temperature=temperature
+            )
+            async with thread.typing():
+                # fetch completion
+                messages = [Message(user=user.name, text=message)]
+                response_data = await generate_completion_response(
+                    messages=messages, user=user, thread_config=thread_data[thread.id]
+                )
+                # send the result
+                await process_response(
+                    user=user, thread=thread, response_data=response_data
+                )
         except Exception as e:
             logger.exception(e)
-            await int.response.send_message(
-                f"Failed to start chat {str(e)}", ephemeral=True
+            await int.followup.send(
+                f"Failed to process chat: {str(e)}",
+                ephemeral=True,
             )
             return
-
-        # create the thread
-        thread = await response.create_thread(
-            name=f"{ACTIVATE_THREAD_PREFX} {user.name[:20]} - {message[:30]}",
-            slowmode_delay=1,
-            reason="gpt-bot",
-            auto_archive_duration=60,
-        )
-        thread_data[thread.id] = ThreadConfig(
-            model=model, max_tokens=max_tokens, temperature=temperature
-        )
-        async with thread.typing():
-            # fetch completion
-            messages = [Message(user=user.name, text=message)]
-            response_data = await generate_completion_response(
-                messages=messages, user=user, thread_config=thread_data[thread.id]
-            )
-            # send the result
-            await process_response(
-                user=user, thread=thread, response_data=response_data
-            )
     except Exception as e:
         logger.exception(e)
-        await int.response.send_message(
-            f"Failed to start chat {str(e)}", ephemeral=True
-        )
+        if not int.response.is_done():
+            await int.response.send_message(
+                f"Failed to start chat: {str(e)}",
+                ephemeral=True,
+            )
 
 
 # calls for each message
