@@ -1,0 +1,22 @@
+services:
+  - type: worker
+    name: discord-gpt-bot
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m src.main
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.8"
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: DISCORD_BOT_TOKEN
+        sync: false
+      - key: DISCORD_CLIENT_ID
+        sync: false
+      - key: DEFAULT_MODEL
+        value: "gpt-3.5-turbo"
+      - key: ALLOWED_SERVER_IDS
+        sync: false
+      - key: SERVER_TO_MODERATION_CHANNEL
+        value: ""
+    autoDeploy: true
