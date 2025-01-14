@@ -1,9 +1,6 @@
 from enum import Enum
 from dataclasses import dataclass
 import openai
-from openai import AsyncOpenAI
-
-from src.moderation import moderate_message
 from typing import Optional, List
 from src.constants import (
     BOT_INSTRUCTIONS,
@@ -14,6 +11,7 @@ import discord
 from src.base import Message, Prompt, Conversation, ThreadConfig
 from src.utils import split_into_shorter_messages, close_thread, logger
 from src.moderation import (
+    moderate_message,
     send_moderation_flagged_message,
     send_moderation_blocked_message,
 )
@@ -38,9 +36,6 @@ class CompletionData:
     status_text: Optional[str]
 
 
-client = AsyncOpenAI()
-
-
 async def generate_completion_response(
     messages: List[Message], user: str, thread_config: ThreadConfig
 ) -> CompletionData:
@@ -53,7 +48,7 @@ async def generate_completion_response(
             convo=Conversation(messages),
         )
         rendered = prompt.full_render(MY_BOT_NAME)
-        response = await client.chat.completions.create(
+        response = await openai.ChatCompletion.acreate(
             model=thread_config.model,
             messages=rendered,
             temperature=thread_config.temperature,
@@ -61,7 +56,7 @@ async def generate_completion_response(
             max_tokens=thread_config.max_tokens,
             stop=["<|endoftext|>"],
         )
-        reply = response.choices[0].message.content.strip()
+        reply = response["choices"][0]["message"]["content"].strip()
         if reply:
             flagged_str, blocked_str = moderate_message(
                 message=(rendered[-1]["content"] + reply)[-500:], user=user
@@ -83,7 +78,7 @@ async def generate_completion_response(
         return CompletionData(
             status=CompletionResult.OK, reply_text=reply, status_text=None
         )
-    except openai.BadRequestError as e:
+    except openai.error.InvalidRequestError as e:
         if "This model's maximum context length" in str(e):
             return CompletionData(
                 status=CompletionResult.TOO_LONG, reply_text=None, status_text=str(e)
