@@ -16,7 +16,7 @@ services:
       - key: DEFAULT_MODEL
         value: "gpt-3.5-turbo"
       - key: ALLOWED_SERVER_IDS
-        sync: false
+        value: "1199878847466836059"
       - key: SERVER_TO_MODERATION_CHANNEL
         value: ""
     autoDeploy: true
